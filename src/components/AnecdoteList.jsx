@@ -42,7 +42,7 @@ const AnecdoteList = () => { // propsit olis käytettävissä tarvittaessa kans
               {anecdote.content}
             </div>
             <div>
-              has {anecdote.votes}
+              has {anecdote.votes} votes  {" "} {/** " " is just adding some whitespace to the end before the button */}
               <button onClick={() => vote(anecdote.id)}>vote</button>  {/* tänne dispatch? */}
             </div>
           </div>

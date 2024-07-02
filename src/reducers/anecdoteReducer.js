@@ -1,54 +1,63 @@
 import { createSlice, current } from "@reduxjs/toolkit" // 6b 2nd half! current is for console.logging from the anecdoteSlice in human-readable format
 
-const anecdotesAtStart = [
-  'If it hurts, do it more often',
-  'Adding manpower to a late software project makes it later!',
-  'The first 90 percent of the code accounts for the first 90 percent of the development time...The remaining 10 percent of the code accounts for the other 90 percent of the development time.',
-  'Any fool can write code that a computer can understand. Good programmers write code that humans can understand.',
-  'Premature optimization is the root of all evil.',
-  'Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.'
-]
+// const anecdotesAtStart = [
+//   'If it hurts, do it more often',
+//   'Adding manpower to a late software project makes it later!',
+//   'The first 90 percent of the code accounts for the first 90 percent of the development time...The remaining 10 percent of the code accounts for the other 90 percent of the development time.',
+//   'Any fool can write code that a computer can understand. Good programmers write code that humans can understand.',
+//   'Premature optimization is the root of all evil.',
+//   'Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.'
+// ]
 
-const getId = () => (100000 * Math.random()).toFixed(0)
+// const anecdotesAtStart = []
+const initialState = []
 
-const asObject = (anecdote) => {                                // turns each anecdote into an object
-  return {
-    content: anecdote,
-    id: getId(),
-    votes: 0
-  }
-}
+// const getId = () => (100000 * Math.random()).toFixed(0)
 
-const initialState = anecdotesAtStart.map(asObject)             // a list of objects! [{content:string, id:int, likes:int}, {....}] 
+// const asObject = (anecdote) => {                                // turns each anecdote into an object
+//   return {
+//     content: anecdote,
+//     id: getId(),
+//     votes: 0
+//   }
+// }
+
+// const initialState = anecdotesAtStart.map(asObject)             // a list of objects! [{content:string, id:int, votes:int}, {....}] 
 
 const anecdoteSlice = createSlice({  
   name: 'anecdotes',  
   initialState,  
   reducers: {    
     createAnecdote(state, action) {      
-      const content = action.payload      
-      state.push({        
-        content,                
-        id: getId(),
-        votes: 0      
-      })    
+      const anecdoteObject = action.payload      // this "content" is now the whole content from services/anecdotes.createNew(content) which returns response.data which is the WHOLE anecdote object, not just the object.content
+      console.log("anecdoteReducer createAnecdote anecdoteObject:", anecdoteObject)
+      state.push(anecdoteObject)
+
+      // state.push({                     // OLD. Now that json-server is in use, things are different    
+      //   content,                
+      //   id: getId(), // the server provides this (6c), so manyal id setting will no longer be done
+      //   votes: 0      
+      // })    
     },    
-    createVote(state, action) {      
-      const id = action.payload      
-      const anecdoteToChange = state.find(anecdote => anecdote.id === id)      
-      const changedAnecdote = {         
-        ...anecdoteToChange,         
-        votes: anecdoteToChange.votes + 1       
+    createVote(state, action) {
+      const id = action.payload
+      const anecdoteToChange = state.find(anecdote => anecdote.id === id)
+      const changedAnecdote = {
+        ...anecdoteToChange,
+        votes: anecdoteToChange.votes + 1
       }      
       console.log(current(state))
-      return state.map(anecdote =>        
-        anecdote.id !== id ? anecdote : changedAnecdote       
-      )         
-    }  
+      return state.map(anecdote =>
+        anecdote.id !== id ? anecdote : changedAnecdote
+      )
+    },
+    setAnecdotes(state, action) {
+      return action.payload       // 6c; the payload is anecdoteService.getAll.then(anecdotes => dispatch(setAnecdotes(anecdotes))), so all anecdotes from the server are dispatched using this one c:
+    }
   },
 })
 
-export const { createAnecdote, createVote } = anecdoteSlice.actions
+export const { createAnecdote, createVote, setAnecdotes } = anecdoteSlice.actions
 export default anecdoteSlice.reducer
 
 // FEED SOMETHING TO THIS REDUCER TO USE IT. default state      // "OLD", 6b 1st half
