@@ -1,3 +1,5 @@
+import { createSlice, current } from "@reduxjs/toolkit" // 6b 2nd half! current is for console.logging from the anecdoteSlice in human-readable format
+
 const anecdotesAtStart = [
   'If it hurts, do it more often',
   'Adding manpower to a late software project makes it later!',
@@ -19,37 +21,67 @@ const asObject = (anecdote) => {                                // turns each an
 
 const initialState = anecdotesAtStart.map(asObject)             // a list of objects! [{content:string, id:int, likes:int}, {....}] 
 
-// FEED SOMETHING TO THIS REDUCER TO USE IT. default state 
-const anecdoteReducer = (state = initialState, action) => {
-  console.log("ENTERING anecdoteReducer")
-  console.log('   state now: ', state)
-  console.log('   action', action)
+const anecdoteSlice = createSlice({  
+  name: 'anecdotes',  
+  initialState,  
+  reducers: {    
+    createAnecdote(state, action) {      
+      const content = action.payload      
+      state.push({        
+        content,                
+        id: getId(),
+        votes: 0      
+      })    
+    },    
+    createVote(state, action) {      
+      const id = action.payload      
+      const anecdoteToChange = state.find(anecdote => anecdote.id === id)      
+      const changedAnecdote = {         
+        ...anecdoteToChange,         
+        votes: anecdoteToChange.votes + 1       
+      }      
+      console.log(current(state))
+      return state.map(anecdote =>        
+        anecdote.id !== id ? anecdote : changedAnecdote       
+      )         
+    }  
+  },
+})
 
-  switch(action.type) {                                         // OMA! mallina noteReducer
-    case 'NEW_ANECDOTE': {
-      const anecdote = action.payload                           // only "content" (the text of the anecdote) is provided to the reducer
-      const newAnecdote = asObject(anecdote)
-      return [...state, newAnecdote]                            // state is [{},{},{}...]
-      }
+export const { createAnecdote, createVote } = anecdoteSlice.actions
+export default anecdoteSlice.reducer
 
-    case 'VOTE': {                                              // OMA! mallina noteReducer
-        const id = action.payload                               // määrittelin payloadiksi id:n pelkästään
-        const anecdoteToVote = state.find(n => n.id === id)     // noteReducer from notesApp as a model here!
-        const votedAnecdote = {
-          ... anecdoteToVote,
-          votes : anecdoteToVote.votes + 1
-        }
-        return state.map(anecdote =>                            // tämä päivittää storen uudella statella. Kun store päivitetään, view (näkymä) renderöidään uudestaan
-          anecdote.id !== id ? anecdote : votedAnecdote
-        )
-      }  
+// FEED SOMETHING TO THIS REDUCER TO USE IT. default state      // "OLD", 6b 1st half
+// const anecdoteReducer = (state = initialState, action) => {  // OLD, 6b 1st half
+//   console.log("ENTERING anecdoteReducer")
+//   console.log('   state now: ', state)
+//   console.log('   action', action)
+
+//   switch(action.type) {                                         // OMA! mallina noteReducer
+//     case 'NEW_ANECDOTE': {
+//       const anecdote = action.payload                           // only "content" (the text of the anecdote) is provided to the reducer
+//       const newAnecdote = asObject(anecdote)
+//       return [...state, newAnecdote]                            // state is [{},{},{}...]
+//       }
+
+//     case 'VOTE': {                                              // OMA! mallina noteReducer
+//         const id = action.payload                               // määrittelin payloadiksi id:n pelkästään
+//         const anecdoteToVote = state.find(anecdote => anecdote.id === id)     // noteReducer from notesApp as a model here!
+//         const votedAnecdote = {
+//           ... anecdoteToVote,
+//           votes : anecdoteToVote.votes + 1
+//         }
+//         return state.map(anecdote =>                            // tämä päivittää storen uudella statella. Kun store päivitetään, view (näkymä) renderöidään uudestaan
+//           anecdote.id !== id ? anecdote : votedAnecdote
+//         )
+//       }  
     
-    default:
-      return state
-  }
-}
+//     default:
+//       return state
+//   }
+// }
 
-export const createVote = id => ({type: 'VOTE', payload: id}) // "action creator"; "functions that create actions are action creators"
-export const createAnecdote = content => ({type: 'NEW_ANECDOTE', payload: content }) // we only send this information to anecdoteReducer; the rest of the information (id and votes:0) will be added there 
+// export const createVote = id => ({type: 'VOTE', payload: id}) // "action creator"; "functions that create actions are action creators" // OLD, 6b 1st half
+// export const createAnecdote = content => ({type: 'NEW_ANECDOTE', payload: content }) // we only send this information to anecdoteReducer; the rest of the information (id and votes:0) will be added there  // OLD, 6b 1st half
 
-export default anecdoteReducer
+// export default anecdoteReducer // OLD, 6b 1st half
