@@ -1,4 +1,5 @@
 import { createSlice, current } from "@reduxjs/toolkit" // 6b 2nd half! current is for console.logging from the anecdoteSlice in human-readable format
+import anecdoteService from "../services/anecdotes" // 6c 2nd half
 
 // const anecdotesAtStart = [
 //   'If it hurts, do it more often',
@@ -27,18 +28,20 @@ const initialState = []
 const anecdoteSlice = createSlice({  
   name: 'anecdotes',  
   initialState,  
-  reducers: {    
-    createAnecdote(state, action) {      
-      const anecdoteObject = action.payload      // this "content" is now the whole content from services/anecdotes.createNew(content) which returns response.data which is the WHOLE anecdote object, not just the object.content
-      console.log("anecdoteReducer createAnecdote anecdoteObject:", anecdoteObject)
-      state.push(anecdoteObject)
+  reducers: {  
 
-      // state.push({                     // OLD. Now that json-server is in use, things are different    
-      //   content,                
-      //   id: getId(), // the server provides this (6c), so manyal id setting will no longer be done
-      //   votes: 0      
-      // })    
-    },    
+    // createAnecdote(state, action) {      
+    //   const anecdoteObject = action.payload      // this "content" is now the whole content from services/anecdotes.createNew(content) which returns response.data which is the WHOLE anecdote object, not just the object.content
+    //   console.log("anecdoteReducer createAnecdote anecdoteObject:", anecdoteObject)
+    //   state.push(anecdoteObject)
+
+    //   // state.push({                     // OLD. Now that json-server is in use, things are different    
+    //   //   content,                
+    //   //   id: getId(), // the server provides this (6c), so manyal id setting will no longer be done
+    //   //   votes: 0      
+    //   // })    
+    // },    
+
     createVote(state, action) {
       const id = action.payload
       const anecdoteToChange = state.find(anecdote => anecdote.id === id)
@@ -53,11 +56,28 @@ const anecdoteSlice = createSlice({
     },
     setAnecdotes(state, action) {
       return action.payload       // 6c; the payload is anecdoteService.getAll.then(anecdotes => dispatch(setAnecdotes(anecdotes))), so all anecdotes from the server are dispatched using this one c:
+    },
+    appendAnecdote(state, action) { // 6c 2nd half; 6.17
+      state.push(action.payload)
     }
   },
 })
 
-export const { createAnecdote, createVote, setAnecdotes } = anecdoteSlice.actions
+export const initializeAnecdotes = () => { // 6c latter half; 6.16
+  return async dispatch => {
+    const anecdotes = await anecdoteService.getAll()
+    dispatch (setAnecdotes(anecdotes))
+  }
+}
+
+export const createAnecdote = content => { // 6c 2nd half; 6.17 NOTE! I also had to create appendAnecdote
+  return async dispatch => {
+    const newAnecdote = await anecdoteService.createNew(content) // creates it in the json-server, then updates the state (store) via dispatch below
+    dispatch(appendAnecdote(newAnecdote))
+  }
+}
+
+export const { createVote, setAnecdotes, appendAnecdote } = anecdoteSlice.actions // 6c 2nd half; 6.17 NOTE! I also had to create appendAnecdote, I didn't have it before..
 export default anecdoteSlice.reducer
 
 // FEED SOMETHING TO THIS REDUCER TO USE IT. default state      // "OLD", 6b 1st half
