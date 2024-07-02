@@ -50,13 +50,16 @@ const anecdoteSlice = createSlice({
         votes: anecdoteToChange.votes + 1
       }      
       console.log(current(state))
+      anecdoteService.updateVote(id) // 6c 6.18. Works!
       return state.map(anecdote =>
         anecdote.id !== id ? anecdote : changedAnecdote
       )
     },
+
     setAnecdotes(state, action) {
       return action.payload       // 6c; the payload is anecdoteService.getAll.then(anecdotes => dispatch(setAnecdotes(anecdotes))), so all anecdotes from the server are dispatched using this one c:
     },
+
     appendAnecdote(state, action) { // 6c 2nd half; 6.17
       state.push(action.payload)
     }
@@ -76,6 +79,12 @@ export const createAnecdote = content => { // 6c 2nd half; 6.17 NOTE! I also had
     dispatch(appendAnecdote(newAnecdote))
   }
 }
+
+// export const createVote = id => {
+//   return async dispatch => {
+    
+//   }
+// }
 
 export const { createVote, setAnecdotes, appendAnecdote } = anecdoteSlice.actions // 6c 2nd half; 6.17 NOTE! I also had to create appendAnecdote, I didn't have it before..
 export default anecdoteSlice.reducer

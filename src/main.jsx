@@ -9,7 +9,6 @@ import App from './App'
 // const store = createStore(reducer)                                                       // OLD, part 6 (b or a)
 //const store = createStore(anecdoteReducer)                                                // OLD; now we have a combined reducer (6b)!
 
-
 console.log("main.jsx")
 
 ReactDOM.createRoot(document.getElementById('root')).render(
