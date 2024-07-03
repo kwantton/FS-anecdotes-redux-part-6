@@ -1,8 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { useDispatch } from "react-redux";          // 6.19
 
 const initialState = ''
-const dispatch = useDispatch                        // 6.19
 
 const notificationSlice = createSlice({
     name:'notification',
@@ -13,15 +11,14 @@ const notificationSlice = createSlice({
             console.log("notificationReducer/notificationSlice:notification:", notification)
             return notification 
         },
-
-        notificationRemover(state, action) {                                // kind of unneccessary, could just use notificationCreator
+        notificationRemover() {                                
             return initialState                                             // could also use return action.payload, if the payload is ''
         }
     }
 })
 
 export const setNotification = (content, seconds) => {                      // 6.19
-    return dispatch => {
+    return dispatch => {                                                        // NB! You can call this "horse" if you want, it'll still work -> no need to import useDispatch, that is
         dispatch(notificationCreator(`you upvoted "${content}"`))
         setTimeout(() => {dispatch(notificationRemover())}, 1000*seconds)       // the parameter is seconds, whereas timeout uses milliseconds
     }

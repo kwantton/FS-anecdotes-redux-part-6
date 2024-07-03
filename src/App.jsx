@@ -15,7 +15,7 @@ const App = () => {
 
   const dispatch = useDispatch()  // 6c, fetch all anecdotes at the very start (json-server)
 
-  // useEffect(() => {    // OLD: 6c 1st half
+  // useEffect(() => {            // OLD: 6c 1st half
   //   anecdoteService      
   //   .getAll().then(anecdotes => dispatch(setAnecdotes(anecdotes)))  
   // }, []) // [] ensures this is called ONCE, at the beginning, to initialize, and not after that
