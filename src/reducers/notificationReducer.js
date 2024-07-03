@@ -10,8 +10,8 @@ const notificationSlice = createSlice({
             const notification = action.payload
             return notification 
         },
-        notificationRemover(state, action) { // kind of unneccessary atm, could just use notificationCreator
-            return initialState // you could also use return action.payload, if the payload is ''
+        notificationRemover(state, action) {    // kind of unneccessary, could just use notificationCreator
+            return initialState                 // could also use return action.payload, if the payload is ''
         }
     }
 })

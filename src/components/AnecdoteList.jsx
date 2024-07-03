@@ -4,13 +4,13 @@ import { notificationCreator } from '../reducers/notificationReducer'
 import { notificationRemover } from '../reducers/notificationReducer'
 
 const AnecdoteList = () => { // propsit olis käytettävissä tarvittaessa kans
-    console.log("ENTERING AnecdoteList")
+    console.log("ENTERING AnecdoteList (component)")
     const dispatch = useDispatch()                // use dispatch to send stuff to the store (store stores the state; reducer dispatches actions to store)
     const anecdotes = useSelector(({ filter, anecdotes }) => {
         if (filter === '') {
             return anecdotes
         } else {
-            const regexObj = new RegExp(filter)
+            const regexObj = new RegExp(filter) // the problem with this is that you can type in bad regex, causing the whole frontend to crash c:::
             console.log("       filter:", filter)
             return anecdotes.filter(anecdote => 
                 regexObj.test(anecdote.content)
@@ -27,8 +27,8 @@ const AnecdoteList = () => { // propsit olis käytettävissä tarvittaessa kans
     // const sortedAnecdotes = anecdotes.sort((a,b) => b.votes - a.votes) // sorting based on the number of votes // OLD! worked before slice-bs, now doesn't
     // const sortedAnecdotes = anecdotes.slice().sort((a,b) => b.votes - a.votes) // new - works! so, "slice()" is needed... dumb
     const sortedAnecdotes = [...anecdotes].sort((a,b) => b.votes - a.votes) // new - works! so, "slice()" is needed... dumb
-    const vote = (id) => {
-        console.log('vote', id) 
+    const vote = id => {
+        console.log('   vote id:', id) 
         dispatch(createVote(id))  // store.dispatch is not usable here or in main - just write "dispatch". Why? I dunno.                                                                
         dispatch(notificationCreator(`you upvoted "${anecdotes.filter(anecdote => anecdote.id === id)[0].content}"`)) // 6.13
         setTimeout(() => {dispatch(notificationRemover())}, 5000)

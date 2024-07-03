@@ -42,18 +42,30 @@ const anecdoteSlice = createSlice({
     //   // })    
     // },    
 
-    createVote(state, action) {
-      const id = action.payload
-      const anecdoteToChange = state.find(anecdote => anecdote.id === id)
-      const changedAnecdote = {
-        ...anecdoteToChange,
-        votes: anecdoteToChange.votes + 1
-      }      
-      console.log(current(state))
-      anecdoteService.updateVote(id) // 6c 6.18. Works!
-      return state.map(anecdote =>
-        anecdote.id !== id ? anecdote : changedAnecdote
+    // createVote(state, action) {
+    //   const id = action.payload
+    //   const anecdoteToChange = state.find(anecdote => anecdote.id === id)
+    //   const changedAnecdote = {
+    //     ...anecdoteToChange,
+    //     votes: anecdoteToChange.votes + 1
+    //   }      
+    //   console.log(current(state))
+    //   anecdoteService.updateVote(id) // 6c 6.18. Works!
+    //   return state.map(anecdote =>
+    //     anecdote.id !== id ? anecdote : changedAnecdote
+    //   )
+    // },
+
+    updateVote(state, action) {
+      const changedAnecdote = action.payload
+      // console.log("anecdoteReducer/createSlice:updateVote:changedAnecdote:", changedAnecdote)
+      // console.log("anecdoteReducer/createSlice:updateVote:state: (line below)")
+      // console.log(current(state))
+      const mappi = state.map(anecdote => 
+        anecdote.id !== changedAnecdote.id ? anecdote : changedAnecdote
       )
+      // console.log("anecdoteReducer/createSlice:updateVote:mappi:", mappi)
+      return mappi
     },
 
     setAnecdotes(state, action) {
@@ -80,13 +92,15 @@ export const createAnecdote = content => { // 6c 2nd half; 6.17 NOTE! I also had
   }
 }
 
-// export const createVote = id => {
-//   return async dispatch => {
-    
-//   }
-// }
+export const createVote = id => { // 6.18. This was originally in anecdoteSlice above in different form. In both cases of createVote, note the paramter "id": in AnecdoteList.jsx, "dispatch(createVote(id))" is called, so this works
+  return async dispatch => {
+    const updatedAnecdote = await anecdoteService.updateVote(id) // response.data is returned from updateVote(id) c: DON'T FORGET AWAIT!!!! >:c
+    console.log("anecdoteReducer/createVote: updatedAnecdote:", updatedAnecdote) // ok
+    dispatch(updateVote(updatedAnecdote))
+  }
+}
 
-export const { createVote, setAnecdotes, appendAnecdote } = anecdoteSlice.actions // 6c 2nd half; 6.17 NOTE! I also had to create appendAnecdote, I didn't have it before..
+export const { setAnecdotes, appendAnecdote, updateVote } = anecdoteSlice.actions // 6c 2nd half; 6.17 NOTE! I also had to create appendAnecdote, I didn't have it before..
 export default anecdoteSlice.reducer
 
 // FEED SOMETHING TO THIS REDUCER TO USE IT. default state      // "OLD", 6b 1st half
