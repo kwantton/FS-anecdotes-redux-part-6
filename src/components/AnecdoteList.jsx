@@ -1,7 +1,8 @@
 import { useSelector, useDispatch } from 'react-redux'  // useSelector to select stuff from the state, see below
 import { createVote } from '../reducers/anecdoteReducer'
-import { notificationCreator } from '../reducers/notificationReducer'
-import { notificationRemover } from '../reducers/notificationReducer'
+import { notificationCreator } from '../reducers/notificationReducer'   // OLD, pre-6.19
+import { notificationRemover } from '../reducers/notificationReducer'   // OLD, pre-6.19
+import { setNotification } from '../reducers/notificationReducer'       // 6.19; combines notificationCreator and notificationRemover (both from notificationReducer)
 
 const AnecdoteList = () => { // propsit olis käytettävissä tarvittaessa kans
     console.log("ENTERING AnecdoteList (component)")
@@ -23,15 +24,19 @@ const AnecdoteList = () => { // propsit olis käytettävissä tarvittaessa kans
     // NB! https://stackoverflow.com/questions/53420055/error-while-sorting-array-of-objects-cannot-assign-to-read-only-property-2-of
     // " Because the array is frozen in strict mode, you'll need to copy the array before sorting it:
     // array = array.slice().sort((a, b) => b.stats.speed - a.stats.speed) " BELOW: !
-    
     // const sortedAnecdotes = anecdotes.sort((a,b) => b.votes - a.votes) // sorting based on the number of votes // OLD! worked before slice-bs, now doesn't
     // const sortedAnecdotes = anecdotes.slice().sort((a,b) => b.votes - a.votes) // new - works! so, "slice()" is needed... dumb
-    const sortedAnecdotes = [...anecdotes].sort((a,b) => b.votes - a.votes) // new - works! so, "slice()" is needed... dumb
+    
+    const sortedAnecdotes = [...anecdotes].sort((a,b) => b.votes - a.votes) // works; the point is, make a COPY: [...anecdotes], or anecdotes.slice() - both are ok
     const vote = id => {
         console.log('   vote id:', id) 
         dispatch(createVote(id))  // store.dispatch is not usable here or in main - just write "dispatch". Why? I dunno.                                                                
-        dispatch(notificationCreator(`you upvoted "${anecdotes.filter(anecdote => anecdote.id === id)[0].content}"`)) // 6.13
-        setTimeout(() => {dispatch(notificationRemover())}, 5000)
+        const anecdote = anecdotes.filter(anecdote => anecdote.id === id)[0] // goes through all of them every time, non-optimal
+        // dispatch(notificationCreator(`you upvoted "${anecdote.content}"`)) // 6.13
+        console.log("AnecdoteList/vote: dispatching setNotification...")
+        dispatch(setNotification(`you upvoted '${anecdote.content}'`, 5)) // 6.19; content, time in seconds
+        console.log("AnecdoteList/vote: COMPLETED dispatching setNotification")
+        // setTimeout(() => {dispatch(notificationRemover())}, 5000)
       }
     
     return (
